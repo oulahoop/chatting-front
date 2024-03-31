@@ -1,33 +1,28 @@
 <template>
     <div class="container">
         <v-card>
-            <h3>Sign In</h3>
-
-            <v-text-field v-model="loginInput" label="Login" variant="outlined" type="email"></v-text-field>
+            <h3>Register</h3>
+            <v-text-field v-model="usernameInput" label="Name" variant="outlined"></v-text-field>
+            <v-text-field v-model="emailInput" label="Email" variant="outlined" type="email"></v-text-field>
             <v-text-field v-model="passwordInput" label="Password" variant="outlined" type="password"></v-text-field> 
 
             <v-card-actions>
-                <ClientOnly><v-btn @click="tryLogin()">Login</v-btn></ClientOnly>
-                <v-btn>Register</v-btn>
+                <ClientOnly><v-btn @click="registerUser()">Register</v-btn></ClientOnly>
             </v-card-actions>
         </v-card>
     </div>
 </template>
 
 <script setup>
-import { useUserStore } from '@/stores/UserStore'
-
-const loginInput = ref('');
+const emailInput = ref('');
+const usernameInput = ref('');
 const passwordInput = ref('');
-const userStore = useUserStore();
 
-
-async function tryLogin() {
-    caLogin(loginInput.value, passwordInput.value).then(response => {
+const registerUser = () => {
+    caRegister(emailInput.value, passwordInput.value, usernameInput.value).then(response => {
         if (response.data != null && response.data.token != null) {
             localStorage.setItem('token', response.data.token);
-            userStore.setUser(response.data.user);
-            navigateTo('/chat/default');
+            navigateTo('/');
         }
     })
 }

@@ -1,6 +1,3 @@
-import { useUserStore } from '@/stores/UserStore';
-import User from '@/models/User'
-
 const API_BASE_URL = 'http://localhost:8000/api';
 
 function postData(path, data) {
@@ -25,7 +22,9 @@ function getData(path) {
 
     return fetch (API_BASE_URL + path, {
         headers: {
-            "Authorization": "Bearer " + localStorage.getItem('token')
+            "Authorization": "Bearer " + localStorage.getItem('token'),
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         }
     })
 }
@@ -45,24 +44,40 @@ export async function caLogin(email, password) {
     return response.json();
 }
 
+export async function caRegister(email, password, name) {
+    let data = {
+        'email' : email,
+        'password' : password,
+        'name' : name
+    };
+
+    let response = await postData("/register", data);
+
+    if (response == null) {
+        return response;
+    }
+
+    return response.json();
+}
+
 export async function isLoggedIn() {
     if (localStorage.getItem('token') == null) {
         return false;
+    } else {
+        if (useUserStore().user != null) {
+            return true;
+        }
+
+        let response = await caMe();
+
+        if (response == null) {
+            return false;
+        }
+
+        useUserStore().setUser(response.data);
+
+        return true;
     }
-
-    let userStore = useUserStore();
-
-    if (userStore.user == null) {
-        let me = await caMe();
-
-        if (me == null) return false;
-
-        let userObject = new User(me.data.id, me.data.name, '', me.data.email);
-
-        userStore.setUser(userObject);
-    }
-
-    return true;
 }
 
 export async function caMe() {
@@ -75,6 +90,60 @@ export async function caMe() {
     }
 
     let response = await getData("/me")
+
+    if (response == null || response.ok == false) {
+        return null;
+    }
+
+    return await response.json();
+}
+
+export async function caCreateServer(name) {
+    let data = {
+        'name' : name
+    };
+
+    let response = await postData("/server", data);
+
+    if (response == null) {
+        return response;
+    }
+
+    return response.json();
+}
+
+export async function caCreateChannel(serverId, name) {
+    let data = {
+        'server_id' : serverId,
+        'name' : name
+    };
+
+    let response = await postData("/channel", data);
+
+    if (response == null) {
+        return response;
+    }
+
+    return response.json();
+}
+
+export async function caCreateMessage(channelId, content) {
+    let data = {
+        'channel_id' : channelId,
+        'content' : content
+    };
+
+    let response = await postData("/messages", data);
+
+    if (response == null) {
+        return response;
+    }
+
+    return response.json();
+}
+
+export async function caGetChannelMessages(channelId) {
+    let response = await getData("/messages/channel/" + channelId);
 
     if (response == null) {
         return response;

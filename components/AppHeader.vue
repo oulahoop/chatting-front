@@ -2,12 +2,16 @@
     <div class="header">
         <h1>Coucou</h1>
         <div>
-            <a href=""><v-btn prepend-icon="$vuetify" variant="text">Home</v-btn></a>
-            <a href="about"><v-btn prepend-icon="$vuetify" variant="text">About</v-btn></a>
-            <a href="contact"><v-btn prepend-icon="$vuetify" variant="text">Contact</v-btn></a>
+            <NuxtLink to="/"><v-btn prepend-icon="$vuetify" variant="text">Home</v-btn></NuxtLink>
+            <NuxtLink to="/about"><v-btn prepend-icon="$vuetify" variant="text">About</v-btn></NuxtLink>
+            <NuxtLink to="/contact"><v-btn prepend-icon="$vuetify" variant="text">Contact</v-btn></NuxtLink>
+            <NuxtLink to="/" v-if="isLoggedIn" @click="logout"><v-btn prepend-icon="$vuetify" variant="text">Logout</v-btn></NuxtLink>
         </div>
     </div>
 </template>
+
+<script setup>
+</script>
 
 <style scoped>
     .header {
@@ -25,3 +29,11 @@
     }
 
 </style>
+
+<script>
+
+const logout = () => {
+    useUserStore().logout();
+    navigateTo('/');
+}
+</script>
