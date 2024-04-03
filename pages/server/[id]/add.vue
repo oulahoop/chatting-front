@@ -60,7 +60,7 @@ const addChannel = () => {
         console.log('resp', response);
         if (response.data != null && response.success === true) {
             useUserStore().addChannel(response.data);
-            navigateTo('/chat/' + useUserStore().serverSelected.id);
+            navigateTo('/chat/' + serverId + '/' + response.data.id);
         }
     })
 }

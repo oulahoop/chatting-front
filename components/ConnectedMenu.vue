@@ -1,24 +1,20 @@
 <template>
-    <div class="connected-menu">
-        <div class="servers" v-if="useUserStore().user !== null && useUserStore().user !== undefined">
-            <div class="server" v-for="server in useUserStore().user.servers" :key="server.id">
-                <NuxtLink @click="refreshData" :to="'/chat/' + server.id"><h3>{{ server.name }}</h3></NuxtLink>
+    <div class="connected-menu" v-if="user !== null">
+        <div class="servers">
+            <div class="server" v-for="server in useUserStore().user.servers" :key="server.id" :class="server.id === +useRoute().params?.server_id ? 'current-server' : ''">
+                <NuxtLink @click="refreshData(server.id)" :to="'/chat/' + server.id" ><img :src="server.image_url" class="server-image"/></NuxtLink>
             </div>
 
             <div class="add-server server">
                 <NuxtLink to="/server/add"><h3>Add new server</h3></NuxtLink>
             </div>
-        </div>
 
-        <div class="channels" v-if="serverSelected !== null">
-            <div class="channel" v-for="channel in serverSelected.channels" :key="channel.id">
-                <NuxtLink :to="'/chat/' + serverSelected.id + '/' + channel.id"><h3>{{ channel.name }}</h3></NuxtLink>
-            </div>
-
-            <div class="add-channel channel">
-                <NuxtLink :to="'/server/' + serverSelected.id + '/add'"><h3>Add new channel</h3></NuxtLink>
+            <div class="add-server server">
+                <NuxtLink to="/server/join"><h3>Join a server</h3></NuxtLink>
             </div>
         </div>
+
+        <ConnectedMenuChannels v-if="serverSelected !== null && serverSelected !== undefined" :serverSelected="serverSelected" />
     </div>
 </template>
 
@@ -53,35 +49,24 @@
         margin-bottom: 10px;
     }
 
-    .channels {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .channel {
-        padding: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-
-    .add-channel {
-        padding: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-
     h3 {
         margin: 0;
+    }
+
+    .current-server {
+        background-color: #272727;
+    }
+
+    .server-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 100%;
     }
 
 </style>
 
 <script setup>
-const user = useUserStore().user;
+const user = ref(useUserStore().user);
 console.log(user);
 
 let params = useRoute().params?.server_id;
@@ -89,13 +74,16 @@ let params = useRoute().params?.server_id;
 const serverSelected = ref(null);
 
 
-const refreshData = () => {
-    console.log('refreshing data');
-    params = useRoute().params?.server_id;
-    console.log('params', params, user);
-    if (params !== undefined && user !== null && user !== undefined) {
+const refreshData = (serverId = null) => {
+    if (serverId !== null) {
+        params = serverId;
+    } else {
+        params = useRoute().params?.server_id;
+    }
+
+    if (params !== undefined && user !== null) {
         console.log('params', params);
-        serverSelected.value = user.servers.find(server => server.id === +params);
+        serverSelected.value = user.value.servers.find(server => server.id === +params);
         console.log(serverSelected.value.id);
     }
 }

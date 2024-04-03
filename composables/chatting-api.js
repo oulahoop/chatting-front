@@ -98,9 +98,10 @@ export async function caMe() {
     return await response.json();
 }
 
-export async function caCreateServer(name) {
+export async function caCreateServer(name, imageUrl) {
     let data = {
-        'name' : name
+        'name' : name,
+        'image_url' : imageUrl
     };
 
     let response = await postData("/server", data);
@@ -144,6 +145,20 @@ export async function caCreateMessage(channelId, content) {
 
 export async function caGetChannelMessages(channelId) {
     let response = await getData("/messages/channel/" + channelId);
+
+    if (response == null) {
+        return response;
+    }
+
+    return response.json();
+}
+
+export async function caJoinServer(serverId) {
+    let data = {
+        'server_id' : serverId
+    };
+
+    let response = await postData("/server/join", data);
 
     if (response == null) {
         return response;

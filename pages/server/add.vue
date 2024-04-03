@@ -4,6 +4,7 @@
             <h1>Add new server</h1>
             <form @submit.prevent="addServer">
                 <input type="text" v-model="serverName" placeholder="Server name" />
+                <input type="text" v-model="imageUrl" placeholder="Image URL" />
                 <button type="submit">Add server</button>
             </form>
         </div>
@@ -47,20 +48,15 @@
 </style>
 
 <script setup>
-
-import { useUserStore } from '@/stores/UserStore';
-
 const serverName = ref('');
+const imageUrl = ref('');
 
 const addServer = () => {
-    caCreateServer(serverName.value).then(response => {
-        console.log(response, response.data);
+    caCreateServer(serverName.value, imageUrl.value).then(response => {
         if (response.data != null && response.success === true) {
-            console.log(useUserStore().user);
             useUserStore().addServer(response.data);
-            console.log(useUserStore().user);
             //navigateTo('/chat/' + response.data.server.id);
-            navigateTo('/chat/defaut');
+            navigateTo('/chat/' + response.data.id);
         }
     });
 }
